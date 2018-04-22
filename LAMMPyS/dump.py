@@ -6,8 +6,11 @@ import math
 
 class Atoms:
 
-    def __init__(self, df_atoms):
-        self._df = df_atoms      # pandas.DataFrame
+    def __init__(self, df_atoms=None, properties=None):
+        if not properties:
+            self._df = df_atoms      # pandas.DataFrame
+        else:
+            self._df = pd.DataFrame(columns=properties)
 
     def __len__(self):
         return len(self._df)
@@ -15,6 +18,9 @@ class Atoms:
     def __getitem__(self, n):
         atom = Atom(self._df.iloc[n], self)
         return atom
+
+    def __str__(self):
+        return str(self._df)
 
     def properties(self):
         return ['id'] + list(self._df.columns)
@@ -24,7 +30,7 @@ class Atoms:
         return atom
 
     def append(self, atom):
-        self._df.append(atom._df)
+        self._df = self._df.append(atom._sr)
 
     def find_neibour(self, taget_atoms, con=lambda atom: True):
         def c_distance(atom1, atom2):
@@ -62,8 +68,8 @@ class Atom():
             self.__dict__['_sr'] = sr_atom
         else:
             index = sr_atom['id']
-            del sr_atom('id')
-            self.__dict__['_sr'] = pd.Series(sr_atom, index=index)
+            del sr_atom['id']
+            self.__dict__['_sr'] = pd.Series(sr_atom, name=index)
 
     def __str__(self):
         return str(self._sr)
@@ -76,8 +82,11 @@ class Atom():
 
     def __setattr__(self, property, value):
         if self.atoms:
-            self.atoms.set_property(self, property, value)
+            self.__dict__['atoms'].set_property(self, property, value)
         self.__dict__['_sr'].set_value(property, value)
+
+    def __getitem__(self, key):
+        return self.__dict__['_sr'][key]
 
 
 class Step:
@@ -99,6 +108,8 @@ class CachedLineList:
 
 
 def read_dump(dumpfile):
+    # id 必须在第一列
+
     print('Loading dump file...')
     lines = CachedLineList(dumpfile)
     n = 0
@@ -117,7 +128,7 @@ def read_dump(dumpfile):
         df_atoms = pd.read_csv(dumpfile, header=None, delim_whitespace=True,
                                names=properties, index_col=0,
                                skiprows=9 + n, nrows=natoms)
-        atoms = Atoms(df_atoms)
+        atoms = Atoms(df_atoms=df_atoms)
         step = Step(atoms, timestep, box)
         steps.append(step)
         n += 9 + natoms
@@ -142,7 +153,7 @@ def write_dump(steps, filename):
                 file.write(p + ' ')
             file.write('\n')
             for atom in step.atoms:
-                file.write(str(atom._name) + ' ')
+                file.write(str(atom.id) + ' ')
                 for p in atom:
                     file.write(str(p) + ' ')
                 file.write('\n')
