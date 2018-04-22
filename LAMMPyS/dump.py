@@ -13,15 +13,18 @@ class Atoms:
         return len(self._df)
 
     def __getitem__(self, n):
-        atom = Atom(self, self._df.iloc[n])
+        atom = Atom(self._df.iloc[n], self)
         return atom
 
     def properties(self):
         return ['id'] + list(self._df.columns)
 
     def id(self, n):
-        atom = Atom(self, self._df.loc[n])
+        atom = Atom(self._df.loc[n], self)
         return atom
+
+    def append(self, atom):
+        self._df.append(atom._df)
 
     def find_neibour(self, taget_atoms, con=lambda atom: True):
         def c_distance(atom1, atom2):
@@ -51,25 +54,30 @@ class Atoms:
 
 class Atom():
 
-    #只是返回的一个实例，并没有真正引用到数据库位置。
+    # 只是返回的一个实例对象，并没有真正引用到数据库位置。原子信息被装在self._df中，为pandas.serials。
 
-    def __init__(self, atoms, df_atom):
-        self.__dict__['_df'] = df_atom
+    def __init__(self, sr_atom, atoms=None):
         self.__dict__['atoms'] = atoms
+        if type(sr_atom) == pd.core.series.Series:
+            self.__dict__['_sr'] = sr_atom
+        else:
+            index = sr_atom['id']
+            del sr_atom('id')
+            self.__dict__['_sr'] = pd.Series(sr_atom, index=index)
 
     def __str__(self):
-        return str(self._df)
+        return str(self._sr)
 
     def __getattr__(self, name):
         if name == 'id':
-            return self.__dict__['_df'].name
+            return self.__dict__['_sr'].name
         else:
-            return self.__dict__['_df'][name]
+            return self.__dict__['_sr'][name]
 
     def __setattr__(self, property, value):
-        self.atoms.set_property(self, property, value)
-        self.__dict__['_df'].set_value(property, value)
-
+        if self.atoms:
+            self.atoms.set_property(self, property, value)
+        self.__dict__['_sr'].set_value(property, value)
 
 
 class Step:
@@ -113,7 +121,8 @@ def read_dump(dumpfile):
         step = Step(atoms, timestep, box)
         steps.append(step)
         n += 9 + natoms
-    print('Loading compeleted, and {0} step(s) have been loaded'.format(len(steps)))
+    print(
+        'Loading compeleted, and {0} step(s) have been loaded.'.format(len(steps)))
     return steps
 
 
