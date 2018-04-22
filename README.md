@@ -10,14 +10,19 @@ MDtools is a python library to manage the outputs of MD(LAMMPS) calculations.
 * pandas
 
 ## Installation
-MDtools is developed on Python3 (Windows 10) and is recommended to be used on Python3. It should be tested before you use it on Python2.
+MDtools is developed on Python3 (Ubuntu) and is recommended to be used on Python3. It should be tested before you use it on Python2.
 
-You can install it via clone and install
+You can install it easily via pip
+```
+$ pip install LAMMPyS
+```
+
+Or via clone and install
 ```
 $ git clone https://github.com/permissionx/LAMMPyS.git  
 $ cd LAMMPyS
-$ python setup.py build  
 $ python setup.py install  
 ```
+
 
 ## Usage
