@@ -1,5 +1,5 @@
 # LAMMPyS
-MDtools is a python library to manage the outputs of MD(LAMMPS) calculations.
+LAMMPyS is a python library to manage the outputs of LAMMPS calculations.
 
 ## Introduction
 [LAMMPyS](https://github.com/permissionx/LAMMPyS) acts as support tools for LAMMPS users to manage the outputs from LAMMPS calculations. MDtools makes it more convinient to extract uesful data or calculat some function that LAMMPS didn't supply or I didn't find from LAMMPS results. You are welcome to debug, optmize MDtools and add new functions to it.
