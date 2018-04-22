@@ -1,0 +1,8 @@
+setup.cfg
+setup.py
+LAMMPyS/__init__.py
+LAMMPyS/dump.py
+LAMMPyS.egg-info/PKG-INFO
+LAMMPyS.egg-info/SOURCES.txt
+LAMMPyS.egg-info/dependency_links.txt
+LAMMPyS.egg-info/top_level.txt
