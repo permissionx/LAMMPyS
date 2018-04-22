@@ -113,7 +113,7 @@ def read_dump(dumpfile):
         step = Step(atoms, timestep, box)
         steps.append(step)
         n += 9 + natoms
-    print('Loading compeleted')
+    print('Loading compeleted, and {0} step(s) have been loaded'.format(len(steps)))
     return steps
 
 
