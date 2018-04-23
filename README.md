@@ -10,7 +10,7 @@ LAMMPyS is a python library to manage the outputs of LAMMPS calculations.
 * pandas
 
 ## Installation
-MDtools is developed on Python3 (Ubuntu) and is recommended to be used on Python3. It should be tested before you use it on Python2.
+LAMMPyS is developed on Python3 (Ubuntu) and is recommended to be used on Python3. It should be tested before you use it on Python2.
 
 You can install it easily via pip
 ```
