@@ -52,7 +52,7 @@ class Atoms:
         if property in self.properties():
             self._df.set_value(atom.id, property, value)
         else:
-            self._df[property] = 0
+            self._df[property] = 0.0
             self._df.set_value(atom.id, property, value)
 
         # 统一属性 添加属性等于添加列 添加功能等于给所有原子添加功能
@@ -126,8 +126,11 @@ def read_dump(dumpfile):
         box = np.array(box)
         properties = lines[n + 8].split()[2:]
         df_atoms = pd.read_csv(dumpfile, header=None, delim_whitespace=True,
-                               names=properties, index_col=0,
+                               names=properties, index_col=properties.index('id'),
                                skiprows=9 + n, nrows=natoms)
+        df_atoms.index = df_atoms.index.astype('int64')
+        if 'type' in df_atoms.columns:
+            df_atoms[['type']] = df_atoms[['type']].astype('int64')
         atoms = Atoms(df_atoms=df_atoms)
         step = Step(atoms, timestep, box)
         steps.append(step)
