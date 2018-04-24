@@ -11,6 +11,7 @@ class Atoms:
             self._df = df_atoms      # pandas.DataFrame
         else:
             self._df = pd.DataFrame(columns=properties)
+        # 'id' is not belong to properties, but name.
 
     def __len__(self):
         return len(self._df)
@@ -30,7 +31,7 @@ class Atoms:
         return atom
 
     def append(self, atom):
-        self._df = self._df.append(atom._sr)
+        self._df = self._df.append(atom.__dict__['_sr'])
 
     def find_neibour(self, taget_atoms, con=lambda atom: True):
         def c_distance(atom1, atom2):
@@ -72,7 +73,7 @@ class Atom():
             self.__dict__['_sr'] = pd.Series(sr_atom, name=index)
 
     def __str__(self):
-        return str(self._sr)
+        return str(self.__dict__['_sr'])
 
     def __getattr__(self, name):
         if name == 'id':
@@ -81,12 +82,17 @@ class Atom():
             return self.__dict__['_sr'][name]
 
     def __setattr__(self, property, value):
-        if self.atoms:
+        # can't asign atom id
+        if self.__dict__['atoms']:
             self.__dict__['atoms'].set_property(self, property, value)
         self.__dict__['_sr'].set_value(property, value)
 
     def __getitem__(self, key):
         return self.__dict__['_sr'][key]
+
+    def copy(self):
+        atom = Atom(self.__dict__['_sr'].copy())
+        return atom
 
 
 class Step:
