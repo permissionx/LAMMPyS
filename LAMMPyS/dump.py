@@ -58,6 +58,10 @@ class Atoms:
 
         # 统一属性 添加属性等于添加列 添加功能等于给所有原子添加功能
 
+    def copy(self):
+        atoms = Atoms(df_atoms=self._df.copy())
+        return atoms
+
 
 class Atom():
 
@@ -68,6 +72,7 @@ class Atom():
         if type(sr_atom) == pd.core.series.Series:
             self.__dict__['_sr'] = sr_atom
         else:
+            # atom must have an "id"
             index = sr_atom['id']
             del sr_atom['id']
             self.__dict__['_sr'] = pd.Series(sr_atom, name=index)
@@ -131,8 +136,10 @@ def read_dump(dumpfile):
             box.append(boundary)
         box = np.array(box)
         properties = lines[n + 8].split()[2:]
+        # atom must have an "id"
         df_atoms = pd.read_csv(dumpfile, header=None, delim_whitespace=True,
-                               names=properties, index_col=properties.index('id'),
+                               names=properties, index_col=properties.index(
+                                   'id'),
                                skiprows=9 + n, nrows=natoms)
         df_atoms.index = df_atoms.index.astype('int64')
         if 'type' in df_atoms.columns:
