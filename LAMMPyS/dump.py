@@ -10,10 +10,16 @@ class Step:
         self.properties = properties
         self.timestep = timestep
         self.box = box
-        self.p_index = {}
-        for p in properties:
-            self.p_index[p] = properties.index(p)
-        #atom[step.p_index['id']]
+    
+    def pi(self, p):
+        #atom[step.pi('id')]
+        if p in self.properties:
+        	return self.properties.index(p)
+        else:
+        	self.properties.append(p)
+        	zeros = np.zeros(len(self.atoms))
+        	self.atoms = np.c_[self.atoms, zeros]
+        	return self.properties.index(p)
 
     def get_atom(self, p, n):
         # p: str
@@ -39,7 +45,7 @@ class Step:
         lines.append('ITEM: TIMESTEP\n')
         lines.append(str(self.timestep) + '\n')
         lines.append('ITEM: NUMBER OF ATOMS\n')
-        lines.append(str(len(step.atoms)) + '\n')
+        lines.append(str(len(self.atoms)) + '\n')
         lines.append('ITEM: BOX BOUNDS pp pp pp\n')
         for d in self.box:
             lines.append('{0} {1}\n'.format(d[0], d[1]))
