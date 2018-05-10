@@ -60,6 +60,7 @@ class Step:
         with open(dump_file, 'w') as file:
             for line in lines:
             	file.write(line)
+        print('Writing compeleted')
 
 
 class Cached_line_list:
