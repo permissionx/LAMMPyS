@@ -3,16 +3,18 @@ import numpy as np
 
 
 class Step:
-    def __init__(self, atoms, properties, timestep, box):
+    def __init__(self, atoms, properties, timestep, box, dic):
         # atoms: np.array
         # properties: [str...]
         self.atoms = np.array(atoms)
         self.properties = properties
         self.timestep = timestep
         self.box = box
+        self.dic = dic
     
     def pi(self, p):
-        #atom[step.pi('id')]
+        # property index or property initialization
+        # atom[step.pi('id')]
         if p in self.properties:
         	return self.properties.index(p)
         else:
@@ -20,6 +22,9 @@ class Step:
         	zeros = np.zeros(len(self.atoms))
         	self.atoms = np.c_[self.atoms, zeros]
         	return self.properties.index(p)
+    
+    def id_get(self,id):
+        return self.atoms[self.dic[id]]  # need to exam
 
     def get_atom(self, p, n):
         # p: str
@@ -98,14 +103,19 @@ def load_step(dump_file, n):
         box.append(boundary)
     box = np.array(box)
     properties = lines[n + 8].split()[2:]
+    id_index = properties.index('id')
+    dic = {}
     atoms = []
     nline = n + 9
+    natom = 0
     while nline < n + natoms + 9:
         line = lines[nline]
         atom = [float(word) for word in line.split()]
         atoms.append(atom)
+        dic[atom[id_index]] = natom
+        natom += 1
         nline += 1
-    step = Step(atoms, properties, timestep, box)
+    step = Step(atoms, properties, timestep, box, dic)
     print('Load {0} atoms compeleted.'.format(natoms))
     return step
 
