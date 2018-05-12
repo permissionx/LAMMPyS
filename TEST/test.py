@@ -1,5 +1,4 @@
 import LAMMPyS as lp
-step = lp.read_dump('ref.dump')[0]
+steps = lp.Steps('test.dump')
+step = steps[-1]
 atoms = step.atoms
-atom = atoms[0]
-print(atom)
