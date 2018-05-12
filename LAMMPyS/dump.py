@@ -1,52 +1,100 @@
 import linecache
 import numpy as np
+import types
+
+
+class Atoms(np.ndarray):
+    # for both atom and atoms
+    def __new__(cls, input_array, step):
+        obj = np.asarray(input_array).view(cls)
+        obj.step = step
+        return obj
+
+    def __array_finalize__(self, obj):
+        self.step = getattr(obj, 'step', None)
+
+    def p(self, p):
+        if len(self.shape) == 2:
+            return self[:, self.step.pi(p)]
+        else:
+            return self[self.step.pi(p)]
+
+    def id(self, id):
+        return self[self.step.dic[id]]
+
+    def select(self, p, n):
+        if len(self.shape) == 2:
+            ps = self.p(p)
+            try:
+                index = np.where(ps == n)[0][0]
+            except IndexError:
+                print('Atom with {0} equals {1} not found.'.format(p, n))
+                raise IndexError
+            return self[index]
+        else:
+            print('Selection must used in atoms')
+
+    def add_p(self, p):
+        if len(self.shape) == 2:
+            if p not in self.step._properties:
+                self.step._properties.append(p)
+                zeros = np.zeros(len(self))
+                self.step.atoms = Atoms(np.c_[self, zeros], self.step)
+                return self.step.atoms
+            else:
+                print('Property {0} already exit.'.format(p))
+                return self
+        elif len(self.shape) == 1 and len(self) != 0: 
+            print('addition of propertiy must used in atoms.')
+            exit()
+        else:
+            if p not in self.step._properties:
+                self.step._properties.append(p)
+            return []
+
+    def set_p(self, p, n):
+        if p in self.step._properties:
+            if len(self.shape) == 2:
+                self[:,self.step.pi(p)] = n
+            else:
+                self[self.step.pi(p)] = n
+        else:
+            print('Property {0} not exit, please add_p(_properties) first.'.format(p))
+
+
+
+
+
+
+
+
 
 
 class Step:
-    def __init__(self, atoms, properties, timestep, box, dic):
+    def __init__(self, atoms, _properties, timestep, box, dic):
         # atoms: np.array
-        # properties: [str...]
-        self.atoms = np.array(atoms)
-        self.properties = properties
+        # _properties: [str...]
+        self.atoms = Atoms(np.array(atoms), self)
+        self._properties = _properties
         self.timestep = timestep
         self.box = box
         self.dic = dic
-    
+        # self.atoms.p = types.MethodType(print_test, self.atoms)
+
     def pi(self, p):
         # property index or property initialization
         # atom[step.pi('id')]
-        if p in self.properties:
-        	return self.properties.index(p)
-        else:
-        	self.properties.append(p)
-        	zeros = np.zeros(len(self.atoms))
-        	self.atoms = np.c_[self.atoms, zeros]
-        	return self.properties.index(p)
-    
-    def id_get(self,id):
-        return self.atoms[self.dic[id]]  # need to exam
-
-    def get_atom(self, p, n):
-        # p: str
-        index = self.properties.index(p)
-        ps = self.atoms[:, index]
-        try:
-        	atom_index = np.where(ps == n)[0][0]
-        except IndexError:
-        	print('Atom with {0} equals {1} not found.'.format(p,n))
-        	raise IndexError
-        atom = self.atoms[atom_index]
-        return atom
+        return self._properties.index(p)
 
     def write(self, dump_file, append=True):
         print('Start writing timestep {0}...'.format(self.timestep))
         lines = []
         if append:
-        	try:
-	            with open(dump_file, 'r') as file:
-	                lines = file.readlines()
-	        except FileNotFoundError:
-	        	pass
+            try:
+                with open(dump_file, 'r') as file:
+                    lines = file.readlines()
+            except FileNotFoundError:
+                pass
         lines.append('ITEM: TIMESTEP\n')
         lines.append(str(self.timestep) + '\n')
         lines.append('ITEM: NUMBER OF ATOMS\n')
@@ -55,7 +103,7 @@ class Step:
         for d in self.box:
             lines.append('{0} {1}\n'.format(d[0], d[1]))
         lines.append('ITEM: ATOMS ')
-        for p in self.properties:
+        for p in self._properties:
             lines.append(p + ' ')
         lines.append('\n')
         for atom in self.atoms:
@@ -64,7 +112,7 @@ class Step:
             lines.append('\n')
         with open(dump_file, 'w') as file:
             for line in lines:
-            	file.write(line)
+                file.write(line)
         print('Writing compeleted')
 
 
@@ -102,8 +150,8 @@ def load_step(dump_file, n):
         boundary = [float(word) for word in lines[n + 5 + i].split()]
         box.append(boundary)
     box = np.array(box)
-    properties = lines[n + 8].split()[2:]
-    id_index = properties.index('id')
+    _properties = lines[n + 8].split()[2:]
+    id_index = _properties.index('id')
     dic = {}
     atoms = []
     nline = n + 9
@@ -115,7 +163,7 @@ def load_step(dump_file, n):
         dic[atom[id_index]] = natom
         natom += 1
         nline += 1
-    step = Step(atoms, properties, timestep, box, dic)
+    step = Step(atoms, _properties, timestep, box, dic)
     print('Load {0} atoms compeleted.'.format(natoms))
     return step
 
@@ -125,6 +173,11 @@ def append(step, atom):
         step.atoms = np.array([atom])
     else:
         step.atoms = np.apend(atoms, [atom])
+
+
+def init_dump(filename):
+    with open(filename, 'w') as file:
+        pass
 
 
 class Steps:
@@ -139,12 +192,12 @@ class Steps:
         return load_step(self.dump_file, n)
 
     def __len__(self):
-    	return len(self.step_lines)
+        return len(self.step_lines)
 
 
 if __name__ == '__main__':
     steps = Steps('test.dump')
-    with open('test.out.dump','w') as file:
-    	pass
-    for step in steps:
-        step.write('test.out.dump')
+    step = steps[-1]
+    atoms = step.atoms
+    # for step in steps:
+   #     step.write('test.out.dump')

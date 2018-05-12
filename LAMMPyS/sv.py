@@ -6,24 +6,15 @@ def sv(refdump, lammpssvdump, svdump):
     refsteps = lp.Steps(refdump)
     refstep = refsteps[0]
     steps = lp.Steps(lammpssvdump)
-
-    # property index
-    x_indexs_ref = []
-    for x in ['x', 'y', 'z']:
-        x_indexs_ref.append(refstep.pi(x))
-    id_index = steps[0].pi('id')
-
-    with open(svdump, 'w') as file:
-        pass
+    # add properties
+    lp.init_dump(svdump)
     for step in steps:
-        x_indexs = []
         for x in ['x', 'y', 'z']:
-            x_indexs.append(step.pi(x))
-        for atom in step.atoms:
-            id = atom[id_index]
-            refatom = refstep.id_get(id)
-            for x_index, x_index_ref in zip(x_indexs, x_indexs_ref):
-                atom[x_index] = refatom[x_index_ref]
+            atoms = step.atoms.add_p(x)
+        for atom in atoms:
+            refatom = refstep.atoms.id(atom.p('id'))
+            for x in ['x', 'y', 'z']:
+                atom.set_p(x,refatom.p(x))
         step.write(svdump)
 
 
