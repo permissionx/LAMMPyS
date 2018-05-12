@@ -10,8 +10,8 @@ def sv(refdump, lammpssvdump, svdump):
     lp.init_dump(svdump)
     for step in steps:
         for x in ['x', 'y', 'z']:
-            atoms = step.atoms.add_p(x)
-        for atom in atoms:
+            step.add_p(x)
+        for atom in step.atoms:
             refatom = refstep.atoms.id(atom.p('id'))
             for x in ['x', 'y', 'z']:
                 atom.set_p(x,refatom.p(x))

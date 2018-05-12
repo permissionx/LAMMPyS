@@ -33,24 +33,6 @@ class Atoms(np.ndarray):
         else:
             print('Selection must used in atoms')
 
-    def add_p(self, p):
-        if len(self.shape) == 2:
-            if p not in self.step._properties:
-                self.step._properties.append(p)
-                zeros = np.zeros(len(self))
-                self.step.atoms = Atoms(np.c_[self, zeros], self.step)
-                return self.step.atoms
-            else:
-                print('Property {0} already exit.'.format(p))
-                return self
-        elif len(self.shape) == 1 and len(self) != 0:
-            print('addition of propertiy must used in atoms.')
-            exit()
-        else:
-            if p not in self.step._properties:
-                self.step._properties.append(p)
-            return []
-
     def set_p(self, p, n):
         if p in self.step._properties:
             if len(self.shape) == 2:
@@ -60,10 +42,6 @@ class Atoms(np.ndarray):
         else:
             print(
                 'Property {0} not exit, please add_p(_properties) first.'.format(p))
-
-    def append(self,atom):
-        self.step.atoms = Atoms(np.r_[self,atom],self.step)
-        return self.step.atoms
 
 
 class Step:
@@ -80,6 +58,18 @@ class Step:
         # property index or property initialization
         # atom[step.pi('id')]
         return self._properties.index(p)
+
+    def add_p(self, p):
+        if p not in self._properties:
+            self._properties.append(p)
+            zeros = np.zeros(len(self.atoms))
+            self.atoms = Atoms(np.c_[self.atoms, zeros], self)
+        else:
+            print('Property {0} already exit.'.format(p))
+
+    def append(self, atom):
+        step.atoms = Atoms(np.r_[self, atom], self)
+        return self.step.atoms
 
     def write(self, dump_file, append=True):
         print('Start writing timestep {0} in {1}...'.format(
