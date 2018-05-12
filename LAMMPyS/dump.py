@@ -1,6 +1,5 @@
 import linecache
 import numpy as np
-import types
 
 
 class Atoms(np.ndarray):
@@ -72,7 +71,6 @@ class Step:
         self.timestep = timestep
         self.box = box
         self.dic = dic
-        # self.atoms.p = types.MethodType(print_test, self.atoms)
 
     def pi(self, p):
         # property index or property initialization
