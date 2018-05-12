@@ -61,6 +61,10 @@ class Atoms(np.ndarray):
             print(
                 'Property {0} not exit, please add_p(_properties) first.'.format(p))
 
+    def append(self,atom):
+        self.step.atoms = Atoms(np.r_[self,atom],self.step)
+        return self.step.atoms
+
 
 class Step:
     def __init__(self, atoms, _properties, timestep, box, dic):
