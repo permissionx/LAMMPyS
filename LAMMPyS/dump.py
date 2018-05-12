@@ -44,7 +44,7 @@ class Atoms(np.ndarray):
             else:
                 print('Property {0} already exit.'.format(p))
                 return self
-        elif len(self.shape) == 1 and len(self) != 0: 
+        elif len(self.shape) == 1 and len(self) != 0:
             print('addition of propertiy must used in atoms.')
             exit()
         else:
@@ -55,19 +55,12 @@ class Atoms(np.ndarray):
     def set_p(self, p, n):
         if p in self.step._properties:
             if len(self.shape) == 2:
-                self[:,self.step.pi(p)] = n
+                self[:, self.step.pi(p)] = n
             else:
                 self[self.step.pi(p)] = n
         else:
-            print('Property {0} not exit, please add_p(_properties) first.'.format(p))
-
-
-
-
-
-
-
-
+            print(
+                'Property {0} not exit, please add_p(_properties) first.'.format(p))
 
 
 class Step:
@@ -87,7 +80,8 @@ class Step:
         return self._properties.index(p)
 
     def write(self, dump_file, append=True):
-        print('Start writing timestep {0}...'.format(self.timestep))
+        print('Start writing timestep {0} in {1}...'.format(
+            self.timestep, dump_file))
         lines = []
         if append:
             try:
@@ -199,5 +193,3 @@ if __name__ == '__main__':
     steps = Steps('test.dump')
     step = steps[-1]
     atoms = step.atoms
-    # for step in steps:
-   #     step.write('test.out.dump')
