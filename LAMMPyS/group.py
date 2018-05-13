@@ -1,11 +1,11 @@
 import LAMMPyS as lp
 
 
-def distance(atom0, atom1):
-    distance = 0
+def _distance(atom0, atom1):
+    _distance = 0
     for x in ['x', 'y', 'z']:
-        distance += (atom0.p(x) - atom1.p(x))**2
-    return distance**0.5
+        _distance += (atom0.p(x) - atom1.p(x))**2
+    return _distance**0.5
 
 
 class Group:
@@ -23,7 +23,7 @@ class Group:
                 		if (atom == mem).all():
                 			break
                 	else:
-	                    if distance(fresh, atom) < cut:
+	                    if _distance(fresh, atom) < cut:
 	                        self.candidates.append(atom)
 	                        self.members.append(atom)
             self.freshes = self.candidates
@@ -35,9 +35,8 @@ class Group:
         return self.members
 
 
-def divide(step, cut):
-    step.add_p('grouped')
-    atoms = step.atoms
+def divide(atoms, cut):
+    atoms = atoms.add_p('grouped')
     groups = []
     for atom in atoms:
         if atom.p('grouped') == 1:
@@ -49,6 +48,7 @@ def divide(step, cut):
 
 if __name__ == '__main__':
     steps = lp.Steps('sv.dump')
-    step = steps[0]
-    groups = divide(step, 5)
+    atoms = steps[0].atoms
+    atoms = atoms[atoms.p('Occupancy') == 2,:]
+    groups = divide(atoms, 5)
     print(len(groups))

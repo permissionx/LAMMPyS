@@ -4,6 +4,7 @@ import numpy as np
 
 class Atoms(np.ndarray):
     # for both atom and atoms
+    # need to add __getattribute__ and __setattribute__
     def __new__(cls, input_array, step):
         obj = np.asarray(input_array).view(cls)
         obj.step = step
@@ -42,6 +43,24 @@ class Atoms(np.ndarray):
         else:
             print(
                 'Property {0} not exit, please add_p(_properties) first.'.format(p))
+
+    def update(self):
+        ids = self.p('id')
+        atoms = []
+        for id in ids:
+            atom = self.step.atoms.id(id)
+            atoms.append(atom)
+        atoms = Atoms(atoms, self.step)
+        return atoms
+
+    def add_p(self, p):
+        # if atoms add_p, their step weill add_p, then step.atoms will add_p.
+        if p not in self.step._properties:
+            self.step.add_p(p)
+            atoms = self.update()
+            return atoms
+        else:
+            print('Property {0} already exit.'.format(p))
 
 
 class Step:
