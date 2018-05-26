@@ -19,9 +19,6 @@ class Atoms(np.ndarray):
         else:
             return self[self.step.pi(p)]
 
-    def id(self, id):
-        return self[self.step.dic[id]]
-
     def select(self, p, n):
         if len(self.shape) == 2:
             ps = self.p(p)
@@ -72,6 +69,9 @@ class Step:
         self.timestep = timestep
         self.box = box
         self.dic = dic
+    
+    def id(self, id):
+        return self.atoms[self.dic[id]]
 
     def pi(self, p):
         # property index or property initialization
