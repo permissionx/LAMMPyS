@@ -12,6 +12,10 @@ class Atoms(np.ndarray):
 
     def __array_finalize__(self, obj):
         self.step = getattr(obj, 'step', None)
+    
+    def id(self, id):
+        step = self.step
+        return step.atoms[step.dic[id]]
 
     def p(self, p):
         if len(self.shape) == 2:
@@ -69,9 +73,6 @@ class Step:
         self.timestep = timestep
         self.box = box
         self.dic = dic
-    
-    def id(self, id):
-        return self.atoms[self.dic[id]]
 
     def pi(self, p):
         # property index or property initialization
