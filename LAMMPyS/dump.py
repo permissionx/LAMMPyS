@@ -12,15 +12,16 @@ class Atoms(np.ndarray):
 
     def __array_finalize__(self, obj):
         self.step = getattr(obj, 'step', None)
+    
+    def id(self, id):
+        step = self.step
+        return step.atoms[step.dic[id]]
 
     def p(self, p):
         if len(self.shape) == 2:
             return self[:, self.step.pi(p)]
         else:
             return self[self.step.pi(p)]
-
-    def id(self, id):
-        return self[self.step.dic[id]]
 
     def select(self, p, n):
         if len(self.shape) == 2:
