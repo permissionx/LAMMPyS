@@ -5,7 +5,7 @@ import numpy as np
 class Atoms(np.ndarray):
     # for both atom and atoms
     # need to add __getattribute__ and __setattribute__
-    def __new__(cls, input_array, step):
+    def __new__(cls, input_array, step = None):
         obj = np.asarray(input_array).view(cls)
         obj.step = step
         return obj
