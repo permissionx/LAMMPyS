@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name="LAMMPyS",
-      version="2.4.2",
+      version="3.0.0",
       description="My python tools for LAMMPS calculation",
       author="permissionx",
       packages=['LAMMPyS'],
